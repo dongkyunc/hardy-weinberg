@@ -1,0 +1,37 @@
+<html>
+
+<head>
+    <title>Hardy Weinberg Equilibrium</title>
+    <link rel="stylesheet" type="text/css" href="myStyle.css">
+</head>
+
+<body>
+    <canvas id="myCanvas"></canvas>
+    
+    <script type='text/javascript' src='myScript.js'></script>
+    
+    <div id="overlay">
+        <div id="initialConditions">
+            Note that gray is dominant over white.
+            <p>
+                Initial Conditions (Parent Generation): <br>
+                Number of homozygous gray: <input id="initHomoGray" type="number" min="0" step="1" value="250" style="width: 60"> <br>
+                Number of heterozygous gray: <input id="initHeteroGray" type="number" min="0" step="1" value="500" style="width: 60"> <br>
+                Number of homozygous white: <input id="initHomoWhite" type="number" min="0" step="1" value="250" style="width: 60"> <br><br>
+
+                Number of offspring: <input id="initChildAmount" type="number" min="0" step="1" value="500" style="width: 60">
+
+                <button type="button" onclick="init();">Start the test!</button>
+            </p>
+
+            
+
+            <div id="f1"></div>
+        </div>
+
+    </div>
+    
+    
+</body>
+
+</html>
