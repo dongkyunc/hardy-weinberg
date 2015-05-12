@@ -3,30 +3,31 @@
 <head>
     <title>Hardy Weinberg Equilibrium</title>
     <link rel="stylesheet" type="text/css" href="myStyle.css">
+    <script type="text/javascript" src="myScript.js"></script>
 </head>
 
 <body>
-    <canvas id="myCanvas"></canvas>
-    
-    <script type='text/javascript' src='myScript.js'></script>
+    <canvas id="myChart" width="800" height="400" style="margin-top:230px; margin-left:20px"></canvas>
+
+    <script src="Chart.js"></script>
+    <script src="myChart.js"></script>
     
     <div id="overlay">
         <div id="initialConditions">
-            Note that gray is dominant over white.
+            Note that gray is dominant over white. <br>
+            <button type="button" onclick="mateClick();">Mate!</button>
             <p>
                 Initial Conditions (Parent Generation): <br>
-                Number of homozygous gray: <input id="initHomoGray" type="number" min="0" step="1" value="250" style="width: 60"> <br>
-                Number of heterozygous gray: <input id="initHeteroGray" type="number" min="0" step="1" value="500" style="width: 60"> <br>
-                Number of homozygous white: <input id="initHomoWhite" type="number" min="0" step="1" value="250" style="width: 60"> <br><br>
+                Number of homozygous gray: <input id="initPP" type="number" min="0" step="1" style="width: 60" value="250"> <br>
+                Number of heterozygous gray: <input id="initPQ" type="number" min="0" step="1" style="width: 60" value="500"> <br>
+                Number of homozygous white: <input id="initQQ" type="number" min="0" step="1" style="width: 60" value="250"> <br><br>
 
-                Number of offspring: <input id="initChildAmount" type="number" min="0" step="1" value="500" style="width: 60">
+                Number of offspring: <input id="childAmount" type="number" min="0" step="1" style="width: 60" value="1000">
 
                 <button type="button" onclick="init();">Start the test!</button>
             </p>
 
-            
-
-            <div id="f1"></div>
+            <div id="generations"></div>
         </div>
 
     </div>
