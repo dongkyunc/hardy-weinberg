@@ -3,36 +3,83 @@
 <head>
     <title>Hardy Weinberg Equilibrium</title>
     <link rel="stylesheet" type="text/css" href="myStyle.css">
-    <script type="text/javascript" src="myScript.js"></script>
 </head>
 
 <body>
-    <canvas id="myChart" width="800" height="400" style="margin-top:230px; margin-left:20px"></canvas>
+    <canvas id="myChart" width="600" height="400"></canvas>
 
     <script src="Chart.js"></script>
     <script src="myChart.js"></script>
-    
-    <div id="overlay">
-        <div id="initialConditions">
-            Note that gray is dominant over white. <br>
-            <button type="button" onclick="mateClick();">Mate!</button>
-            <p>
-                Initial Conditions (Parent Generation): <br>
-                Number of homozygous gray: <input id="initPP" type="number" min="0" step="1" style="width: 60" value="250"> <br>
-                Number of heterozygous gray: <input id="initPQ" type="number" min="0" step="1" style="width: 60" value="500"> <br>
-                Number of homozygous white: <input id="initQQ" type="number" min="0" step="1" style="width: 60" value="250"> <br><br>
+    <script src="myScript.js"></script>
 
-                Number of offspring: <input id="childAmount" type="number" min="0" step="1" style="width: 60" value="1000">
-
-                <button type="button" onclick="init();">Start the test!</button>
-            </p>
-
-            <div id="generations"></div>
-        </div>
-
+    <div id="counter">
+        <div id="genCounter">0</div>
+        <div id="genText">Generations</div>
     </div>
     
-    
+    <div id="container">
+        <div class="overlay">
+            <h3>Legend</h3> The dark red is homozygous dominant.
+            <br> The blue is heterozygous dominant.
+            <br> The green is homozygous recessive.
+        </div>
+        <div class="overlay">
+            <h3>Mating</h3>
+            
+            <div id="buttons">
+                <button type="button" onclick="mateClick();" id="mate">Mate!</button>
+                <button type="button" onclick="clearGenerations();">Kill everyone</button><br>
+                <button type="button" onclick="autoMate()" id="autorun">Run simulation automatically</button>
+                <br><br>
+            </div>
+            
+            <div id="pop" style="display: none;">
+                Population of next generation:<br>
+                <input id="childAmount" type="number" min="0" step="1" style="width: 60" value="2000">
+            </div>
+
+            <div id="initial">
+                Initial Conditions (Parent Generation):
+                <br> Number of homozygous dominant:
+                <input id="initPP" type="number" min="0" step="1" style="width: 60" value="500">
+                <br> Number of heterozygous dominant:
+                <input id="initPQ" type="number" min="0" step="1" style="width: 60" value="1000">
+                <br> Number of homozygous recessive:
+                <input id="initQQ" type="number" min="0" step="1" style="width: 60" value="500">
+            </div>
+        </div>
+
+        <div class="overlay">
+            <h3>Natural Selection</h3> Probability of a genotype surviving:
+            <br> pp:
+            <input id="pp-survival" type="number" min="0" max="1" step="0.1" style="width: 50" value="1">
+            <br> pq:
+            <input id="pq-survival" type="number" min="0" max="1" step="0.1" style="width: 50" value="1">
+            <br> qq:
+            <input id="qq-survival" type="number" min="0" max="1" step="0.1" style="width: 50" value="1">
+        </div>
+
+        <div class="overlay">
+            <h3>Mutation</h3> Chance of mutation (0-1):
+            <br> p &rarr; q:
+            <input id="p-q-mutate" type="number" min="0" max="1" step="0.1" style="width: 50" value="0">
+            <br> q &rarr; p:
+            <input id="q-p-mutate" type="number" min="0" max="1" step="0.1" style="width: 50" value="0">
+            <!-- &rarr; is → -->
+        </div>
+
+        <div class="overlay">
+            <h3>Genetic Flow</h3>
+            Positive integers are immigration<br>
+            Negative integers are emigration<br>
+            pp:
+            <input id="pp-gen-drift" type="number" min="0" step="1" style="width: 50" value="0">
+            <br> pq:
+            <input id="pq-gen-drift" type="number" min="0" step="1" style="width: 50" value="0">
+            <br> qq:
+            <input id="qq-gen-drift" type="number" min="0" step="1" style="width: 50" value="0">
+        </div>
+    </div>
 </body>
 
 </html>
