@@ -66,3 +66,8 @@ h3 {
     width: 5em;
     height: 3.5em;
 }
+
+#citations {
+    font-size: .5em;
+    line-height: normal;
+}
