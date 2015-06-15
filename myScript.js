@@ -1,12 +1,16 @@
 "use strict";
 
-var generations = [];
+var generations = []; // Holds all the data
+
+// Config for the automatic mating
 var mateTimer;
 var timerBoolean = false;
 
+// Holds info for genetic flow
 var addedGeneration = [];
 var removedGeneration = [0,0,0];
 
+// Runs a timer to turn on/off mating
 function autoMate() {
     if (!timerBoolean) {
         mateTimer = setInterval(mateClick, 300);
@@ -19,6 +23,7 @@ function autoMate() {
     }
 }
 
+// Each item in the generation is an organism
 var Organism = function (allele1, allele2) {
     this.gene = [allele1, allele2];
 
@@ -34,6 +39,8 @@ var Organism = function (allele1, allele2) {
     }
 };
 
+// Placing it here for javascript optimization
+// returnGenotype() is pretty useful for finding certain organisms
 Organism.prototype.returnGenotype = function () {
     if (this.phenotype === "dominant") {
         if (this.genotype === "homozygous") {
@@ -47,9 +54,11 @@ Organism.prototype.returnGenotype = function () {
 };
 
 var Generation = function (_organisms) {
+    // This is an array of organisms
     this.organisms = _organisms;
     this.populationSize = this.organisms.length;
-
+    
+    // Counts the number of each genotype
     this.pp = 0;
     this.pq = 0;
     this.qq = 0;
@@ -70,7 +79,8 @@ var Generation = function (_organisms) {
             break;
         }
     }
-
+    
+    // Counts the number of each gene (I don't think I ever used this data)
     this.p = (2 * this.pp + this.pq) / (2 * this.populationSize);
     this.q = (2 * this.qq + this.pq) / (2 * this.populationSize);
     this.ppPercent = this.pp / this.populationSize;
@@ -78,41 +88,56 @@ var Generation = function (_organisms) {
     this.qqPercent = this.qq / this.populationSize;
 };
 
+// Again, prototype for optimization
 Generation.prototype.mate = function (childrenAmount) {
+    // This handles gene flow
     migrate();
     var childArray = addedGeneration;
-    var x = 0;
+    
+    // Too harsh of a environment makes the code sad and run way too many times
+    var infiniteLoopStopper = 0;
+    
+    // This is where the new organisms are made
     for (var i = 0; i < childrenAmount; i++) {
+        // Pulling two organisms from the parent generation
         var father = this.organisms[Math.floor(Math.random() * this.populationSize)];
         var mother = this.organisms[Math.floor(Math.random() * this.populationSize)];
-
+        
+        // Getting a random allele from each
         var fatherAllele = father.gene[Math.round(Math.random())];
         var motherAllele = mother.gene[Math.round(Math.random())];
-
+        
+        // Mutating threshold  on user-inputted mutation rates
         var pqMutateRate = parseFloat(document.getElementById("p-q-mutate").value);
         var qpMutateRate = parseFloat(document.getElementById("q-p-mutate").value);
-
+        
+        // Two random numbers
         var pqChance = Math.random();
         var qpChance = Math.random();
-
+        
+        // If the two random numbers are lower than the mutation threshold, the gene mutates
         if (fatherAllele === "p" && pqChance < pqMutateRate) {
             fatherAllele = "q";
         } else if (qpChance < qpMutateRate) { // fatherAllele === "q"
             fatherAllele = "p";
         }
-
         if (motherAllele === "p" && pqChance < pqMutateRate) {
             motherAllele = "q";
         } else if (qpChance < qpMutateRate) { // fatherAllele === "q"
             motherAllele = "p";
         }
 
+        // Creating a new organisms from the alleles. Hasn't survived yet
         var child = new Organism(fatherAllele, motherAllele);
+        
+        // Similar to mutation rate. Creating a threshold and an random number
         var killRate;
         var survivalRate = Math.random();
+        
+        // Making sure that emigration is handled before organism is added
         var emigrationQueueID;
         
-
+        // Getting the survival threshold from the user input
         switch (child.returnGenotype()) {
         case "pp":
             killRate = parseFloat(document.getElementById("pp-survival").value);
@@ -132,20 +157,26 @@ Generation.prototype.mate = function (childrenAmount) {
             break;
         }
         
+        // Seeing if the organism passes the survival threshold
         if (survivalRate < killRate) {
             // It lives!
-            //childArray.push(child);
+            
+            // If all the emigrants haven't left yet, this one child will
             if (removedGeneration[emigrationQueueID] < 1) {
+                // Only runs when there is no more emigration
                 childArray.push(child);
             } else {
+                // Amount more needed to emigrate goes down by one
                 removedGeneration[emigrationQueueID]--;
                 i--;   
             }
         } else {
+            // Child isn't added, so loop is added
             i--;
-            x++;
+            infiniteLoopStopper++;
             
-            if (x > this.organisms.length*200) {
+            // Stopping if it's too slow
+            if (infiniteLoopStopper > this.organisms.length*200) {
                 alert("Hm... It looks like natural selection was too hard on this species. Everyone died. Exiting program.");
                 document.getElementById("mate").disabled = true;
                 document.getElementById("autorun").disabled = true;
@@ -160,12 +191,17 @@ Generation.prototype.mate = function (childrenAmount) {
 
 
     }
+    // Resetting gene flow variables
     addedGeneration = [];
     removedGeneration = [0,0,0];
+    
+    // New generation of children
     return new Generation(childArray);
 };
 
+// Only runs if it's the first generation
 function init() {
+    // Parsing data
     var initPP = parseInt(document.getElementById("initPP").value);
     var initPQ = parseInt(document.getElementById("initPQ").value);
     var initQQ = parseInt(document.getElementById("initQQ").value);
@@ -185,15 +221,29 @@ function init() {
 
     generations[0] = new Generation(parents);
     myLineChart.addData([initPP / childAmount, initPQ / childAmount, initQQ / childAmount], "");
+    
+    
+    // Some UI changes
+    document.getElementById("initial").style.display = "none";
+    document.getElementById("pop").style.display = "block";
+    document.getElementById("initPP").disabled = true;
+    document.getElementById("initPQ").disabled = true;
+    document.getElementById("initQQ").disabled = true;
+
+    document.getElementById('childAmount').value = parseInt(document.getElementById("initPP").value) + 
+                  parseInt(document.getElementById("initPQ").value) + 
+                  parseInt(document.getElementById("initQQ").value);
 }
 
 function mateClick() {
+    // Altering pop. amount by gene value
     var childAmount = parseInt(document.getElementById('childAmount').value) +
                       parseInt(document.getElementById("pp-gen-drift").value) +
                       parseInt(document.getElementById("pq-gen-drift").value) +
                       parseInt(document.getElementById("qq-gen-drift").value);
     document.getElementById('childAmount').value = childAmount;
     
+    // Edge case to see if all organisms are gone
     if (childAmount <= 0) {
         alert("Everyone died! End of simulation.");
         document.getElementById("mate").disabled = true;
@@ -204,27 +254,24 @@ function mateClick() {
         return;
     }
     
+    // Init if first generation
     if (generations.length === 0) {
         init();
-        document.getElementById("initial").style.display = "none";
-        document.getElementById("pop").style.display = "block";
-        document.getElementById("initPP").disabled = true;
-        document.getElementById("initPQ").disabled = true;
-        document.getElementById("initQQ").disabled = true;
-        
-        document.getElementById('childAmount').value = parseInt(document.getElementById("initPP").value) + 
-                      parseInt(document.getElementById("initPQ").value) + 
-                      parseInt(document.getElementById("initQQ").value);
     }
+    
+    // Calling the latest generation to mate
     var parent = generations[generations.length - 1];
     generations.push(parent.mate(childAmount));
-
+    
+    // Pushing the newest generation (From above parent) to the 
     var children = generations[generations.length - 1];
     myLineChart.addData([children.ppPercent, children.pqPercent, children.qqPercent], "");
     
+    // This increments the counter on the screen
     document.getElementById("genCounter").innerHTML = generations.length - 1;
 }
 
+// Resets everthing
 function clearGenerations() {
     if (timerBoolean) {
         autoMate();
@@ -235,6 +282,7 @@ function clearGenerations() {
     }
     generations = [];
     
+    // UI Stuff
     document.getElementById("initial").style.display = "block";
     document.getElementById("pop").style.display = "none";
     
@@ -248,6 +296,7 @@ function clearGenerations() {
     document.getElementById("genCounter").innerHTML = 0;
 }
 
+// Gene flow
 function migrate() {
     var ppGroup = parseInt(document.getElementById("pp-gen-drift").value)
     if (ppGroup >= 0) {
